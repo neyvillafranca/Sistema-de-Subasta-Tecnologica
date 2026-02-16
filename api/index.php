@@ -1,49 +1,45 @@
 <?php
 // Composer autoloader
 require_once 'vendor/autoload.php';
-/*Encabezada de las solicitudes*/
-/*CORS*/
+
+/* CORS */
 header("Access-Control-Allow-Origin: * ");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: *");
 header('Content-Type: application/json');
 
-/*--- Requerimientos Clases o librerías*/
+/* --- Clases core */
 require_once "controllers/core/Config.php";
 require_once "controllers/core/HandleException.php";
 require_once "controllers/core/Logger.php";
 require_once "controllers/core/MySqlConnect.php";
 require_once "controllers/core/Request.php";
 require_once "controllers/core/Response.php";
-//Middleware
+
+
+/* --- Middleware */
 require_once "middleware/AuthMiddleware.php";
 
-/***--- Agregar todos los modelos*/
+/* --- Models */
+require_once "models/UsuarioModel.php";
+require_once "models/ObjetoModel.php";
+require_once "models/SubastaModel.php";
+require_once "models/PujaModel.php";
 require_once "models/RolModel.php";
-require_once "models/UserModel.php";
-require_once "models/DirectorModel.php";
-require_once "models/ActorModel.php";
-require_once "models/GenreModel.php";
-require_once "models/MovieModel.php";
-require_once "models/ShopRentalModel.php";
-require_once "models/RentalModel.php";
-require_once "models/RentalMovieModel.php";
-require_once "models/ImageModel.php";
+require_once "models/EstadoObjetoModel.php";
+require_once "models/ImagenModel.php";
+require_once "models/CategoriaModel.php";
+/* --- Controllers */
+require_once "controllers/UsuarioController.php";
+require_once "controllers/ObjetoController.php";
+require_once "controllers/SubastaController.php";
+require_once "controllers/PujaController.php";
+require_once "controllers/RolController.php";
+require_once "controllers/EstadoObjetoController.php";
+require_once "controllers/ImagenController.php";
+require_once "controllers/CategoriaController.php";
 
-/***--- Agregar todos los controladores*/
-require_once "controllers/UserController.php";
-require_once "controllers/DirectorController.php";
-require_once "controllers/ActorController.php";
-require_once "controllers/GenreController.php";
-require_once "controllers/MovieController.php";
-require_once "controllers/ShopRentalController.php";
-require_once "controllers/RentalController.php";
-require_once "controllers/ImageController.php";  
-
-//Enrutador
+/* --- Enrutador */
 require_once "routes/RoutesController.php";
 $index = new RoutesController();
 $index->index();
-
-
-

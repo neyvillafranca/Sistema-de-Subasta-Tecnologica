@@ -1,5 +1,5 @@
 <?php
-class RolModel
+class EstadoObjetoModel
 {
     public $enlace;
     public function __construct()
@@ -10,7 +10,7 @@ class RolModel
     public function all()
     {
         //Consulta sql
-        $vSql = "SELECT * FROM roles;";
+        $vSql = "SELECT * FROM estado_objeto;";
 
         //Ejecutar la consulta
         $vResultado = $this->enlace->ExecuteSQL($vSql);
@@ -22,7 +22,7 @@ class RolModel
     public function get($id)
     {
         //Consulta sql
-        $vSql = "SELECT * FROM roles where id_rol=$id";
+        $vSql = "SELECT * FROM estado_objeto where idestadoobjeto=$id";
 
         //Ejecutar la consulta
         $vResultado = $this->enlace->ExecuteSQL($vSql);
@@ -30,12 +30,13 @@ class RolModel
         return $vResultado[0];
     }
 
-    public function getRolUser($idUser)
+    public function getEstadoObjeto($idObj)
     {
         //Consulta sql
-        $vSql = "SELECT r.id_rol,r.nombre
-            FROM roles r,usuarios u
-            where r.id_rol = u.roles_id_rol and u.id_usuario=$idUser";
+
+        $vSql = "SELECT eo.idestadoobjeto,eo.descripcion
+            FROM estado_objeto eo, objetos o
+            where eo.idestadoobjeto = o.idestadoobjeto and  o.id_objeto=$idObj";
 
         //Ejecutar la consulta
         $vResultado = $this->enlace->ExecuteSQL($vSql);

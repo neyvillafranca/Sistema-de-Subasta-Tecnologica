@@ -90,10 +90,11 @@ class RoutesController
             return;
         }
 
-        $controller = $routesArray[0] ?? null;
+        $controller = ucfirst($routesArray[0]) ?? null;
         $action     = $routesArray[1] ?? null;
         $param1     = $routesArray[2] ?? null;
         $param2     = $routesArray[3] ?? null;
+      
         // echo "Controller: " . $controller . ", acción: " . $action . ", param1: " . $param1 . ", param2: " . $param2;
 
         try {
