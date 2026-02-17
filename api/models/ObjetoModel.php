@@ -14,60 +14,72 @@ class ObjetoModel
      * @param 
      * @return $vResultado - Lista de objetos
      */
-    public function all()
-    {
-        $imagenM = new ImagenModel();
-        $categoriaM = new CategoriaModel();
-        $estadoM = new EstadoObjetoModel();
-        //Consulta SQL
-        $vSQL = "SELECT * FROM objetos order by nombre asc;";
-        //Ejecutar la consulta
-        $vResultado = $this->enlace->ExecuteSQL($vSQL);
-        if(!empty($vResultado) && is_array($vResultado)){
-            for($i=0; $i < count($vResultado); $i++){
-                //Imagen
-                $vResultado[$i]->imagen=$imagenM->getImagenObjeto($vResultado[$i]->id);
-                //categoria --genres
-                $vResultado[$i]->catres=$categoriaM->getCategoriaObjeto($vResultado[$i]->id);
-                //imagenes
-                $vResultado[$i]->estres=$estadoM->getEstadoObjeto($vResultado[$i]->id);
-            }
+   public function all()
+{
+    $imagenM = new ImagenModel();
+    $categoriaM = new CategoriaModel();
+    $estadoM = new EstadoObjetoModel();
+
+    $vSQL = "SELECT * FROM objetos ORDER BY nombre ASC;";
+    $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+    if (!empty($vResultado) && is_array($vResultado)) {
+        for ($i = 0; $i < count($vResultado); $i++) {
+
+            $idObjeto = $vResultado[$i]->id_objeto;
+
+            // Imagen
+            $vResultado[$i]->imagen = $imagenM->getImagenObjeto($idObjeto);
+
+            // Categorías
+            $vResultado[$i]->categoria = $categoriaM->getCategoriaObjeto($idObjeto);
+
+            // Estado
+            $vResultado[$i]->estado = $estadoM->getEstadoObjeto($idObjeto);
         }
-        
-        //Retornar la respuesta
-        return $vResultado;
     }
+
+    return $vResultado;
+}
+
     /**
      * Obtener una pelicula
      * @param $id de la pelicula
      * @return $vresultado - Objeto pelicula
      */
     //
-    public function get($id)
-    {
-        $estadoO = new EstadoObjetoModel();
-        $categoriaO = new CategoriaModel();
-        $imagenO = new ImagenModel();
+   public function get($id)
+{
+    $estadoO = new EstadoObjetoModel();
+    $categoriaO = new CategoriaModel();
+    $imagenO = new ImagenModel();
 
-        $vSql = "SELECT * FROM objetos
-                    where id_objeto=$id;";
+    $id = intval($id);
 
-        //Ejecutar la consulta sql
-        $vResultado = $this->enlace->executeSQL($vSql);
+    $vSql = "SELECT * 
+             FROM objetos 
+             WHERE id_objeto = $id";
 
-        if(!empty($vResultado)){
-            $vResultado=$vResultado[0];
-            //Imagen
-            $vResultado->imagen=$imagenO->getImagenObjeto($vResultado->id_imagen_objeto);
-            //director
-            $vResultado->categoria=$categoriaO->get($vResultado->id_categoria);
-            //Genero -- genres
-            $vResultado->genres=$estadoO->getEstadoObjeto($vResultado->idestadoobjeto);
-   
-        }
-        //Retornar la respuesta
-        return $vResultado;
+    $vResultado = $this->enlace->ExecuteSQL($vSql);
+
+    if (!empty($vResultado)) {
+        $objeto = $vResultado[0];
+
+        // Imagen (por id_objeto)
+        $objeto->imagen = $imagenO->getImagenObjeto($objeto->id_objeto);
+
+        // Categorías (tabla puente)
+        $objeto->categoria = $categoriaO->getCategoriaObjeto($objeto->id_objeto);
+
+        // Estado del objeto (por id_objeto)
+        $objeto->estado = $estadoO->getEstadoObjeto($objeto->id_objeto);
+
+        return $objeto;
     }
+
+    return null;
+}
+
     /**
      * Obtener las peliculas por tienda
      * @param $idShopRental identificador de la tienda
