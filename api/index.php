@@ -29,6 +29,8 @@ require_once "models/RolModel.php";
 require_once "models/EstadoObjetoModel.php";
 require_once "models/ImagenModel.php";
 require_once "models/CategoriaModel.php";
+require_once "models/EstadoSubastaModel.php";
+
 /* --- Controllers */
 require_once "controllers/UsuarioController.php";
 require_once "controllers/ObjetoController.php";
@@ -38,6 +40,7 @@ require_once "controllers/RolController.php";
 require_once "controllers/EstadoObjetoController.php";
 require_once "controllers/ImagenController.php";
 require_once "controllers/CategoriaController.php";
+require_once "controllers/EstadoSubastaController.php";
 
 /* --- Enrutador */
 require_once "routes/RoutesController.php";
