@@ -8,6 +8,19 @@ class PujaModel
      * Campos: usuario, monto, fecha y hora
      * Validación: solo pujas asociadas al id_subasta solicitado
      */
+    public function contarPorSubasta($id_subasta)
+    {
+        $db = new MySqlConnect();
+
+        $sql = "SELECT COUNT(*) AS total
+            FROM pujas
+            WHERE id_subasta = $id_subasta";
+
+        $resultado = $db->executeSQL($sql, "asoc");
+
+        return (int) $resultado[0]['total'];
+    }
+
     public function getBySubasta($id_subasta)
     {
         $db          = new MySqlConnect();

@@ -14,33 +14,33 @@ class ObjetoModel
      * @param 
      * @return $vResultado - Lista de objetos
      */
-   public function all()
-{
-    $imagenM = new ImagenModel();
-    $categoriaM = new CategoriaModel();
-    $estadoM = new EstadoObjetoModel();
+    public function all()
+    {
+        $imagenM = new ImagenModel();
+        $categoriaM = new CategoriaModel();
+        $estadoM = new EstadoObjetoModel();
 
-    $vSQL = "SELECT * FROM objetos ORDER BY nombre ASC;";
-    $vResultado = $this->enlace->ExecuteSQL($vSQL);
+        $vSQL = "SELECT * FROM objetos ORDER BY nombre ASC;";
+        $vResultado = $this->enlace->ExecuteSQL($vSQL);
 
-    if (!empty($vResultado) && is_array($vResultado)) {
-        for ($i = 0; $i < count($vResultado); $i++) {
+        if (!empty($vResultado) && is_array($vResultado)) {
+            for ($i = 0; $i < count($vResultado); $i++) {
 
-            $idObjeto = $vResultado[$i]->id_objeto;
+                $idObjeto = $vResultado[$i]->id_objeto;
 
-            // Imagen
-            $vResultado[$i]->imagen = $imagenM->getImagenObjeto($idObjeto);
+                // Imagen
+                $vResultado[$i]->imagen = $imagenM->getImagenObjeto($idObjeto);
 
-            // Categorías
-            $vResultado[$i]->categoria = $categoriaM->getCategoriaObjeto($idObjeto);
+                // Categorías
+                $vResultado[$i]->categoria = $categoriaM->getCategoriaObjeto($idObjeto);
 
-            // Estado
-            $vResultado[$i]->estado = $estadoM->getEstadoObjeto($idObjeto);
+                // Estado
+                $vResultado[$i]->estado = $estadoM->getEstadoObjeto($idObjeto);
+            }
         }
-    }
 
-    return $vResultado;
-}
+        return $vResultado;
+    }
 
     /**
      * Obtener una pelicula
@@ -48,37 +48,37 @@ class ObjetoModel
      * @return $vresultado - Objeto pelicula
      */
     //
-   public function get($id)
-{
-    $estadoO = new EstadoObjetoModel();
-    $categoriaO = new CategoriaModel();
-    $imagenO = new ImagenModel();
+    public function get($id)
+    {
+        $estadoO = new EstadoObjetoModel();
+        $categoriaO = new CategoriaModel();
+        $imagenO = new ImagenModel();
 
-    $id = intval($id);
+        $id = intval($id);
 
-    $vSql = "SELECT * 
+        $vSql = "SELECT * 
              FROM objetos 
              WHERE id_objeto = $id";
 
-    $vResultado = $this->enlace->ExecuteSQL($vSql);
+        $vResultado = $this->enlace->ExecuteSQL($vSql);
 
-    if (!empty($vResultado)) {
-        $objeto = $vResultado[0];
+        if (!empty($vResultado)) {
+            $objeto = $vResultado[0];
 
-        // Imagen (por id_objeto)
-        $objeto->imagen = $imagenO->getImagenObjeto($objeto->id_objeto);
+            // Imagen (por id_objeto)
+            $objeto->imagen = $imagenO->getImagenObjeto($objeto->id_objeto);
 
-        // Categorías (tabla puente)
-        $objeto->categoria = $categoriaO->getCategoriaObjeto($objeto->id_objeto);
+            // Categorías (tabla puente)
+            $objeto->categoria = $categoriaO->getCategoriaObjeto($objeto->id_objeto);
 
-        // Estado del objeto (por id_objeto)
-        $objeto->estado = $estadoO->getEstadoObjeto($objeto->id_objeto);
+            // Estado del objeto (por id_objeto)
+            $objeto->estado = $estadoO->getEstadoObjeto($objeto->id_objeto);
 
-        return $objeto;
+            return $objeto;
+        }
+
+        return null;
     }
-
-    return null;
-}
 
     /**
      * Obtener las peliculas por tienda
@@ -110,7 +110,7 @@ class ObjetoModel
 
     //     return $vResultado;
     // }
-        
+
     public function objetosBySubasta($idSubasta)
     {
         $subastaO = new SubastaModel();
@@ -121,7 +121,7 @@ class ObjetoModel
                 ON s.id_objeto = o.id_objeto
             WHERE s.id_subasta = $idSubasta";
 
-             $vResultado = $this->enlace->ExecuteSQL($vSql);
+        $vResultado = $this->enlace->ExecuteSQL($vSql);
         //Retornar la respuesta
 
         return $vResultado;
@@ -138,9 +138,9 @@ class ObjetoModel
     //     $vResultado = null;
     //     //Consulta sql
     //     $vSql = "SELECT count(mg.genre_id) as 'Cantidad', g.title as 'Genero'
-	// 		FROM genre g, movie_genre mg, movie m
-	// 		where mg.movie_id=m.id and mg.genre_id=g.id
-	// 		group by mg.genre_id";
+    // 		FROM genre g, movie_genre mg, movie m
+    // 		where mg.movie_id=m.id and mg.genre_id=g.id
+    // 		group by mg.genre_id";
 
     //     //Ejecutar la consulta
     //     $vResultado = $this->enlace->ExecuteSQL($vSql);
@@ -150,7 +150,7 @@ class ObjetoModel
 
 
 
-     
+
     // // public function all()
     // // {
     //     $db  = new MySqlConnect();
@@ -187,7 +187,7 @@ class ObjetoModel
     //     return $db->executeSQL($sql, "asoc");
     // }
 
-    
+
     // public function get($id)
     // {
     //     $db = new MySqlConnect();
@@ -251,5 +251,5 @@ class ObjetoModel
 
     //     return [$objeto];
     // }
-    
+
 }

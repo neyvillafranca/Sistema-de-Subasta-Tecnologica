@@ -1,6 +1,75 @@
 <?php
 class SubastaModel
 {
+
+    //Conectarse a la BD
+    public $enlace;
+
+    public function __construct()
+    {
+        $this->enlace = new MySqlConnect();
+    }
+    /**
+     * Listar peliculas
+     * @param 
+     * @return $vResultado - Lista de objetos
+     */
+    public function all()
+    {
+
+        $estadoSubasta = new EstadoSubastaModel();
+        $objetoSubasta = new ObjetoModel();
+
+        $vSQL = "SELECT * FROM subastas ORDER BY fecha_inicio ASC;";
+        $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+        if (!empty($vResultado) && is_array($vResultado)) {
+            for ($i = 0; $i < count($vResultado); $i++) {
+
+                $id_subasta = $vResultado[$i]->id_subasta;
+                // Estado
+                $vResultado[$i]->estado = $estadoSubasta->getEstadoSubasta($id_subasta);
+                //objeto 
+                $vResultado[$i]->objeto = $objetoSubasta->get($id_subasta);
+            }
+        }
+
+        return $vResultado;
+    }
+
+    /**
+     * Obtener una pelicula
+     * @param $id de la pelicula
+     * @return $vresultado - Objeto pelicula
+     */
+    //
+    public function get($id)
+    {
+        $estadoSubasta = new EstadoSubastaModel();
+        $objetoSubasta = new ObjetoModel();
+
+        $vSql = "SELECT * 
+             FROM subastas 
+             WHERE id_subasta = $id";
+
+        $vResultado = $this->enlace->ExecuteSQL($vSql);
+
+        if (!empty($vResultado)) {
+            $subasta = $vResultado[0];
+
+            // Estado del subasta (por idSubasta)
+            $subasta->estado = $estadoSubasta->getEstadoSubasta($subasta->id_subasta);
+            // objeto (por id_objeto)
+            $subasta->objeto = $objetoSubasta->get($subasta->id_subasta);
+
+            return $subasta;
+        }
+
+        return null;
+    }
+
+
+//____________________________________________________________________________________________________________________________________________
     /**
      * GET /subastas/activas
      * Listado subastas activas (idestadosubasta = 1)
@@ -8,33 +77,32 @@ class SubastaModel
      */
     public function getActivas()
     {
-        $db  = new MySqlConnect();
-        $sql = "SELECT 
-                    s.id_subasta,
-                    o.nombre                AS objeto,
-                    s.fecha_inicio,
-                    s.fecha_cierre,
-                    s.precio_base,
-                    s.incremento_minimo,
-                    (
-                        SELECT COUNT(*)
-                        FROM pujas p
-                        WHERE p.id_subasta = s.id_subasta
-                    )                       AS cantidad_pujas,
-                    (
-                        SELECT img.url_imagen
-                        FROM imagenes_objeto img
-                        WHERE img.objetos_id_objeto = o.id_objeto
-                        ORDER BY img.id_imagen_objeto ASC
-                        LIMIT 1
-                    )                       AS imagen_objeto
-                FROM subastas s
-                INNER JOIN objetos o ON s.id_objeto = o.id_objeto
-                INNER JOIN estado_subasta es ON es.idestado = s.idestado
-                WHERE es.descripcion = 'Activa'
-                ORDER BY s.fecha_inicio DESC";
+        $estadoSubasta = new EstadoSubastaModel();
+        $objetoModel = new ObjetoModel();
+        $pujaModel = new PujaModel();
 
-        return $db->executeSQL($sql, "asoc");
+        // Consulta simple: solo traer subastas activas
+        $vSQL = "SELECT s.* 
+             FROM subastas s
+             INNER JOIN estado_subasta es ON es.idestado = s.idestado
+             WHERE es.descripcion = 'Activa'
+             ORDER BY s.fecha_inicio DESC";
+
+        $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+        if (!empty($vResultado) && is_array($vResultado)) {
+            for ($i = 0; $i < count($vResultado); $i++) {
+                $id_subasta = $vResultado[$i]->id_subasta;
+
+                // Objeto con su imagen principal
+                $vResultado[$i]->objeto = $objetoModel->get($vResultado[$i]->id_objeto);
+
+                // Cantidad de pujas calculada
+                $vResultado[$i]->cantidad_pujas = $pujaModel->contarPorSubasta($id_subasta);
+            }
+        }
+
+        return $vResultado;
     }
 
     /**
@@ -44,35 +112,36 @@ class SubastaModel
      */
     public function getFinalizadas()
     {
-        $db  = new MySqlConnect();
-        $sql = "SELECT 
-                    s.id_subasta,
-                    o.nombre                AS objeto,
-                    s.fecha_cierre,
-                    s.precio_base,
-                    s.incremento_minimo,
-                    es.descripcion          AS estado_final,
-                    (
-                        SELECT COUNT(*)
-                        FROM pujas p
-                        WHERE p.id_subasta = s.id_subasta
-                    )                       AS cantidad_pujas,
-                    (
-                        SELECT img.url_imagen
-                        FROM imagenes_objeto img
-                        WHERE img.objetos_id_objeto = o.id_objeto
-                        ORDER BY img.id_imagen_objeto ASC
-                        LIMIT 1
-                    )                       AS imagen_objeto
-                FROM subastas s
-                INNER JOIN objetos o ON s.id_objeto = o.id_objeto
-                INNER JOIN estado_subasta es ON es.idestado = s.idestado
-                WHERE es.descripcion IN ('Finalizada', 'Cancelada')
-                ORDER BY s.fecha_cierre DESC";
+        $estadoSubasta = new EstadoSubastaModel();
+        $objetoModel = new ObjetoModel();
+        $pujaModel = new PujaModel();
 
-        return $db->executeSQL($sql, "asoc");
+        // Consulta simple: solo traer subastas finalizadas o canceladas
+        $vSQL = "SELECT s.* 
+             FROM subastas s
+             INNER JOIN estado_subasta es ON es.idestado = s.idestado
+             WHERE es.descripcion IN ('Finalizada', 'Cancelada')
+             ORDER BY s.fecha_cierre DESC";
+
+        $vResultado = $this->enlace->ExecuteSQL($vSQL);
+
+        if (!empty($vResultado) && is_array($vResultado)) {
+            for ($i = 0; $i < count($vResultado); $i++) {
+                $id_subasta = $vResultado[$i]->id_subasta;
+
+                // Estado de la subasta
+                $vResultado[$i]->estado = $estadoSubasta->getEstadoSubasta($id_subasta);
+
+                // Objeto con su imagen principal
+                $vResultado[$i]->objeto = $objetoModel->get($vResultado[$i]->id_objeto);
+
+                // Cantidad de pujas calculada
+                $vResultado[$i]->cantidad_pujas = $pujaModel->contarPorSubasta($id_subasta);
+            }
+        }
+
+        return $vResultado;
     }
-
     /**
      * GET /subastas/{id}
      * Detalle completo de una subasta:
@@ -80,7 +149,7 @@ class SubastaModel
      * - Datos completos de la subasta
      * - Campo calculado: cantidad_pujas
      */
-    public function get($id)
+    public function gett($id)
     {
         $db = new MySqlConnect();
         $id = intval($id);

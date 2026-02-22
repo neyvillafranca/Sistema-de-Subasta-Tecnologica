@@ -1,6 +1,21 @@
 <?php
 class Subasta
 {
+
+        public function index()
+    {
+        try {
+            $response = new Response();
+            $model    = new SubastaModel();
+            $result   = $model->all();
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            $response->toJSON(null);
+            handleException($e);
+        }
+    }
+    
+
     /**
      * GET /subasta/activas
      * Listado subastas activas + cantidad de pujas (campo calculado)
@@ -51,6 +66,8 @@ class Subasta
             handleException($e);
         }
     }
+
+
 
     /**
      * GET /subasta/pujas/{id_subasta}
