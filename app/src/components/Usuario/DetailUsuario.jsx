@@ -49,7 +49,7 @@ export default function DetailUsuario() {
       const result = response.data;
 
       if (result?.success && result.data) {
-        setUsers([result.data]); // 🔑 backend devuelve objeto
+        setUsers([result.data]); // backend devuelve objeto
       } else {
         setError("Usuario no encontrado");
       }

@@ -14,6 +14,7 @@ class ImagenModel
     {
         return false;
     }
+    
     //Obtener una imagen de una pelicula
     public function getImagenObjeto($idObjeto)
     {

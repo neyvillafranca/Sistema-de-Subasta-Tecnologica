@@ -53,6 +53,8 @@ class ObjetoModel
         $estadoO = new EstadoObjetoModel();
         $categoriaO = new CategoriaModel();
         $imagenO = new ImagenModel();
+        $subastaO = new SubastaModel();
+        $usuarioO = new UsuarioModel();
 
         $id = intval($id);
 
@@ -73,11 +75,42 @@ class ObjetoModel
 
             // Estado del objeto (por id_objeto)
             $objeto->estado = $estadoO->getEstadoObjeto($objeto->id_objeto);
+            // Propietario (vendedor)
+            $objeto->propietario = $usuarioO->get($objeto->id_vendedor);
+
+            // Historial de subastas donde participó
+            $objeto->historial_subastas = $this->getHistorialSubastas($objeto->id_objeto);
+
 
             return $objeto;
         }
 
         return null;
+    }
+
+    private function getHistorialSubastas($id_objeto)
+    {
+        $estadoSubasta = new EstadoSubastaModel();
+
+        $vSql = "SELECT 
+                s.id_subasta,
+                s.fecha_inicio,
+                s.fecha_cierre,
+                s.idestado
+             FROM subastas s
+             WHERE s.id_objeto = $id_objeto
+             ORDER BY s.fecha_inicio DESC";
+
+        $resultado = $this->enlace->ExecuteSQL($vSql);
+
+        if (!empty($resultado) && is_array($resultado)) {
+            // Agregar el estado de cada subasta
+            for ($i = 0; $i < count($resultado); $i++) {
+                $resultado[$i]->estado_subasta = $estadoSubasta->getEstadoSubasta($resultado[$i]->id_subasta);
+            }
+        }
+
+        return $resultado ?: [];
     }
 
     /**

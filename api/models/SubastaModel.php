@@ -47,26 +47,32 @@ class SubastaModel
     {
         $estadoSubasta = new EstadoSubastaModel();
         $objetoSubasta = new ObjetoModel();
+        $pujaModel = new PujaModel();
 
         $vSql = "SELECT * 
-             FROM subastas 
-             WHERE id_subasta = $id";
+         FROM subastas 
+         WHERE id_subasta = $id";
 
         $vResultado = $this->enlace->ExecuteSQL($vSql);
 
         if (!empty($vResultado)) {
             $subasta = $vResultado[0];
 
-            // Estado del subasta (por idSubasta)
+            // Estado de la subasta
             $subasta->estado = $estadoSubasta->getEstadoSubasta($subasta->id_subasta);
-            // objeto (por id_objeto)
-            $subasta->objeto = $objetoSubasta->get($subasta->id_subasta);
+
+            // Objeto
+            $subasta->objeto = $objetoSubasta->get($subasta->id_objeto);
+
+            // ✅ Cantidad total de pujas (calculado)
+            $subasta->cantidad_pujas = $pujaModel->contarPorSubasta($subasta->id_subasta);
 
             return $subasta;
         }
 
         return null;
     }
+  
 
 
 //____________________________________________________________________________________________________________________________________________

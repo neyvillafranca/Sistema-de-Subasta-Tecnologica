@@ -50,9 +50,34 @@ export default function Header() {
       href: "/usuarios",
       icon: <Wrench className="h-4 w-4" />,
     },
-     {
+    {
       title: "Detalles Usuarios",
       href: "/usuarios/detail",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      title: "Objetos",
+      href: "/objetos",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      title: "Detalles Objetos",
+      href: "/objetos/detail",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      title: "Subastas Activas",
+      href: "/subastas/activas",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      title: "Subastas Finalizadas",
+      href: "/subastas/finalizadas",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      title: "Detalle Subasta",
+      href: "/subastas/detail",
       icon: <Wrench className="h-4 w-4" />,
     },
     {

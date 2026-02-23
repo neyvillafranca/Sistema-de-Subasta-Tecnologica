@@ -8,15 +8,28 @@ class UsuarioModel
     }
 
     // Retornar el objeto
+public function all()
+{
+    $rolU = new RolModel();
 
-    public function all()
-    {
-        $vSql = "SELECT * 
-                FROM usuarios 
-                ORDER BY nombre_completo ASC";
-        $vResultado = $this->enlace->ExecuteSQL($vSql);
-        return $vResultado;
+    $vSql = "SELECT *
+             FROM usuarios
+             ORDER BY nombre_completo ASC";
+
+    $usuarios = $this->enlace->ExecuteSQL($vSql);
+
+  
+    if (!$usuarios || !is_array($usuarios)) {
+        return [];
     }
+
+    foreach ($usuarios as $usuario) {
+        $usuario->rol = $rolU->getRolUser($usuario->id_usuario);
+    }
+
+    return $usuarios;
+}
+
 
     /**
      * GET /usuarios/{id}
@@ -24,7 +37,7 @@ class UsuarioModel
      */
     public function get($id)
     {
-        $id = intval($id);
+       
         $rolU = new RolModel();
 
         $vSql = "SELECT * 

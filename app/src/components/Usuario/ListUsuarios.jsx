@@ -35,7 +35,7 @@ export default function TableUsers() {
 
   useEffect(() => {
     const fetchData = async () => {
-        
+
       try {
         const response = await UsuarioService.getUsuario();
         const result = response.data;
@@ -94,7 +94,7 @@ export default function TableUsers() {
 
                 {/* Rol (objeto) */}
                 <TableCell>
-                  {user.rol?.nombre }
+                  {user.rol?.nombre}
                 </TableCell>
 
                 {/* Estado (string -> number) */}

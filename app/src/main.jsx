@@ -7,6 +7,13 @@ import { Home } from './components/Home/Home'
 import { PageNotFound } from './components/Home/PageNotFound'
 import ListUsuarios from "./components/Usuario/listUsuarios";
 import DetailUsuario from "./components/Usuario/DetailUsuario";
+import ListObjetos from "./components/Objeto/ListObjetos";
+import DetailObjetos from "./components/Objeto/DetailObjetos";
+import ListSubastasActivas from "./components/Subasta/ListSubastasActivas";
+import ListSubastasFinalizadas from "./components/Subasta/ListSubastasFinalizadas";
+import DetailSubasta from "./components/Subasta/DetailSubastas";
+import HistorialPujas from "./components/Pujas/HistorialPujas";
+
 
 const rutas = createBrowserRouter([
   {
@@ -14,10 +21,15 @@ const rutas = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
 
-       { path: "usuarios", element: <ListUsuarios /> },
-
-      // DETALLE (con ID)
+      { path: "subastas/activas", element: <ListSubastasActivas /> },
+      { path: "subastas/finalizadas", element: <ListSubastasFinalizadas /> },
+      { path: "subastas/:id", element: <DetailSubasta /> },
+      { path: "objetos", element: <ListObjetos /> },
+      { path: "objetos/:id", element: <DetailObjetos /> },
+      { path: "usuarios", element: <ListUsuarios /> },
       { path: "usuarios/:id", element: <DetailUsuario /> },
+      { path: "subastas/activas", element: <ListSubastasActivas /> },
+      { path: "subastas/:id/pujas", element: <HistorialPujas /> },
       { path: "*", element: <PageNotFound /> },
     ],
   },
