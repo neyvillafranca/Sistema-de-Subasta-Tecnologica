@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
     Table,
     TableHeader,
@@ -11,13 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, ImageOff } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 import { EmptyState } from "../ui/custom/EmptyState";
 import SubastaService from "@/services/SubastaService";
 
 export default function DetailSubasta() {
+    const { id } = useParams(); // 👈 ID desde /subastas/:id
+
     const [subastaId, setSubastaId] = useState("");
     const [subasta, setSubasta] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -25,15 +27,16 @@ export default function DetailSubasta() {
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    const handleSearch = async () => {
-        if (!subastaId) return;
+    // 🔁 Función reutilizable
+    const fetchSubasta = async (idSubasta) => {
+        if (!idSubasta) return;
 
         setLoading(true);
         setError(null);
         setSubasta(null);
 
         try {
-            const response = await SubastaService.getSubastaById(subastaId);
+            const response = await SubastaService.getSubastaById(idSubasta);
             const result = response.data;
 
             if (result?.success && result.data) {
@@ -49,6 +52,19 @@ export default function DetailSubasta() {
         }
     };
 
+    // 🚀 Carga automática si viene por URL
+    useEffect(() => {
+        if (id) {
+            setSubastaId(id);
+            fetchSubasta(id);
+        }
+    }, [id]);
+
+    // 🔍 Búsqueda manual
+    const handleSearch = () => {
+        fetchSubasta(subastaId);
+    };
+
     const objeto = subasta?.objeto;
     const totalPujas = subasta?.cantidad_pujas ?? 0;
 
@@ -56,20 +72,7 @@ export default function DetailSubasta() {
         <div className="container mx-auto py-8 space-y-6">
             <h1 className="text-3xl font-bold">Detalle de Subasta</h1>
 
-            {/* 🔍 Buscador */}
-            <div className="flex gap-2 max-w-sm">
-                <Input
-                    type="number"
-                    placeholder="Ingrese ID de la subasta"
-                    value={subastaId}
-                    onChange={(e) => setSubastaId(e.target.value)}
-                />
-                <Button onClick={handleSearch}>
-                    <Search className="w-4 h-4 mr-1" />
-                    Buscar
-                </Button>
-            </div>
-
+        
             {loading && <LoadingGrid />}
             {error && <ErrorAlert title="Error" message={error} />}
             {!loading && !error && !subasta && (
@@ -78,7 +81,7 @@ export default function DetailSubasta() {
 
             {subasta && (
                 <>
-                    {/* 🖼️ Imagen del objeto */}
+                    {/* 🖼️ Imagen */}
                     <div className="grid sm:grid-cols-2 gap-6">
                         {objeto?.imagenes?.length > 0 ? (
                             <img
@@ -98,7 +101,7 @@ export default function DetailSubasta() {
                             </div>
                         )}
 
-                        {/* 📦 Información del objeto */}
+                        {/* 📦 Info objeto */}
                         <div className="space-y-3">
                             <h2 className="text-xl font-semibold">{objeto?.nombre}</h2>
 
@@ -123,7 +126,7 @@ export default function DetailSubasta() {
                         </div>
                     </div>
 
-                    {/* 🔨 Datos de la subasta */}
+                    {/* 🔨 Datos subasta */}
                     <div className="rounded-md border p-6 space-y-3">
                         <h3 className="text-lg font-semibold">Datos de la Subasta</h3>
 
@@ -151,7 +154,7 @@ export default function DetailSubasta() {
                             </p>
                         </div>
 
-                        {/* 📜 Historial de pujas */}
+                        {/* 📜 Historial */}
                         <Button asChild className="mt-4">
                             <Link to={`/subastas/${subasta.id_subasta}/pujas`}>
                                 Ver historial de pujas

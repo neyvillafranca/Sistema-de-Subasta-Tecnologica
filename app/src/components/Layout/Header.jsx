@@ -36,7 +36,7 @@ export default function Header() {
   const userEmail = "Invitado";
 
   const navItems = [
-    { title: "Películas", href: "/movie", icon: <Film className="h-4 w-4" /> },
+    { title: "Articulos Tecnologicos", href: "/movie", icon: <Film className="h-4 w-4" /> },
     {
       title: "Filtrar Películas",
       href: "/movie/filter",
