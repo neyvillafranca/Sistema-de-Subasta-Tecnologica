@@ -2,7 +2,7 @@
 
 //class Genre
 class Imagen{
-    //POST Crear
+  //  POST Crear
     public function create()
     {
         try {
@@ -22,6 +22,7 @@ class Imagen{
             
         }
     }
+    
        // GET por id objeto
     public function get($idObjeto)
     {

@@ -8,27 +8,27 @@ class UsuarioModel
     }
 
     // Retornar el objeto
-public function all()
-{
-    $rolU = new RolModel();
+    public function all()
+    {
+        $rolU = new RolModel();
 
-    $vSql = "SELECT *
+        $vSql = "SELECT *
              FROM usuarios
              ORDER BY nombre_completo ASC";
 
-    $usuarios = $this->enlace->ExecuteSQL($vSql);
+        $usuarios = $this->enlace->ExecuteSQL($vSql);
 
-  
-    if (!$usuarios || !is_array($usuarios)) {
-        return [];
+
+        if (!$usuarios || !is_array($usuarios)) {
+            return [];
+        }
+
+        foreach ($usuarios as $usuario) {
+            $usuario->rol = $rolU->getRolUser($usuario->id_usuario);
+        }
+
+        return $usuarios;
     }
-
-    foreach ($usuarios as $usuario) {
-        $usuario->rol = $rolU->getRolUser($usuario->id_usuario);
-    }
-
-    return $usuarios;
-}
 
 
     /**
@@ -37,7 +37,7 @@ public function all()
      */
     public function get($id)
     {
-       
+
         $rolU = new RolModel();
 
         $vSql = "SELECT * 
@@ -79,4 +79,20 @@ public function all()
 
         return $usuario;
     }
+
+    public function update($objeto)
+{
+    // Consulta sql - Actualizar nombre_completo, email y estado por id_usuario
+    $sql = "UPDATE usuarios SET " .
+           "nombre_completo = '$objeto->nombre_completo', " .
+           "email = '$objeto->email', " .
+           "estado = $objeto->estado " .
+           "WHERE id_usuario = $objeto->id_usuario";
+
+    // Ejecutar la consulta
+    $cResults = $this->enlace->executeSQL_DML($sql);
+
+    // Retornar usuario actualizado
+    return $this->get($objeto->id_usuario);
+}
 }

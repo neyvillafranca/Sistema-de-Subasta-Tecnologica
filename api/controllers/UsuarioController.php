@@ -31,4 +31,23 @@ class Usuario
             handleException($e);
         }
     }
+
+    public function update()
+    {
+        try {
+            $request = new Request();
+            $response = new Response();
+            //Obtener json enviado
+            $inputJSON = $request->getJSON();
+            //Instancia del modelo
+            $usuario = new UsuarioModel();
+            //Acción del modelo a ejecutar
+            $result = $usuario->update($inputJSON);
+            //Dar respuesta
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            $response->toJSON($result);
+            handleException($e);
+        }
+    }
 }
