@@ -7,6 +7,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ImageOff, Gavel, Clock, Ban, CheckCircle } from "lucide-react";
 import PropTypes from "prop-types";
+import { Button } from "../ui/button";
+import { Link } from "react-router-dom";
 
 ListCardSubastasFinalizadas.propTypes = {
     data: PropTypes.array.isRequired,
@@ -82,6 +84,13 @@ export default function ListCardSubastasFinalizadas({ data }) {
                                 </span>
                             </p>
                         </CardContent>
+                        <div className="border-t p-3 flex justify-end">
+                            <Button size="sm" asChild>
+                                <Link to={`/subastas/${subasta.id_subasta}`}>
+                                    Ver subasta
+                                </Link>
+                            </Button>
+                        </div>
                     </Card>
                 ))}
         </div>

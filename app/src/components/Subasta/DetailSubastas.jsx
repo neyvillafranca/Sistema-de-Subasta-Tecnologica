@@ -18,7 +18,7 @@ import { EmptyState } from "../ui/custom/EmptyState";
 import SubastaService from "@/services/SubastaService";
 
 export default function DetailSubasta() {
-    const { id } = useParams(); // 👈 ID desde /subastas/:id
+    const { id } = useParams(); 
 
     const [subastaId, setSubastaId] = useState("");
     const [subasta, setSubasta] = useState(null);
@@ -27,7 +27,7 @@ export default function DetailSubasta() {
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    // 🔁 Función reutilizable
+
     const fetchSubasta = async (idSubasta) => {
         if (!idSubasta) return;
 
@@ -52,7 +52,6 @@ export default function DetailSubasta() {
         }
     };
 
-    // 🚀 Carga automática si viene por URL
     useEffect(() => {
         if (id) {
             setSubastaId(id);
@@ -154,12 +153,13 @@ export default function DetailSubasta() {
                             </p>
                         </div>
 
-                        {/* 📜 Historial */}
-                        <Button asChild className="mt-4">
-                            <Link to={`/subastas/${subasta.id_subasta}/pujas`}>
-                                Ver historial de pujas
-                            </Link>
-                        </Button>
+                        {totalPujas > 0 && (
+                            <Button asChild className="mt-4">
+                                <Link to={`/subastas/${subasta.id_subasta}/pujas`}>
+                                    Ver historial de pujas
+                                </Link>
+                            </Button>
+                        )} 
                     </div>
                 </>
             )}

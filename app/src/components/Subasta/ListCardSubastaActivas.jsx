@@ -73,13 +73,6 @@ export default function ListCardSubastaActivas({ data }) {
                                 </span>
                             </p>
 
-                            {/* Precio base */}
-                            <p className="text-muted-foreground">
-                                Precio base:{" "}
-                                <span className="font-semibold text-foreground">
-                                    ₡{Number(subasta.precio_base).toLocaleString()}
-                                </span>
-                            </p>
                         </CardContent>
 
                         {/* Acción */}

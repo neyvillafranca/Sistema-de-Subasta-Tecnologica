@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
     Table,
     TableHeader,
@@ -11,13 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Search, ImageOff } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 import { EmptyState } from "../ui/custom/EmptyState";
 import ObjetoService from "@/services/ObjetoService";
 
 export default function DetailObjetos() {
+    const {id} = useParams();
     const [objetoId, setObjetoId] = useState("");
     const [objeto, setObjeto] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -25,15 +26,15 @@ export default function DetailObjetos() {
 
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-    const handleSearch = async () => {
-        if (!objetoId) return;
+   const fetchObjeto = async (idObjeto) => {
+        if (!idObjeto) return;
 
         setLoading(true);
         setError(null);
         setObjeto(null);
 
         try {
-            const response = await ObjetoService.getObjetoById(objetoId);
+            const response = await ObjetoService.getObjetoById(idObjeto);
             console.log("Response completo:", response);
             const result = response.data;
 
@@ -51,28 +52,26 @@ export default function DetailObjetos() {
         }
     };
 
+        useEffect(() => {
+            if (id) {
+                setObjetoId(id);
+                fetchObjeto(id);
+            }
+        }, [id]);
+
+         const handleSearch = () => {
+        fetchObjeto(objetoId);
+    };
+
     return (
         <div className="container mx-auto py-8 space-y-6">
             <h1 className="text-3xl font-bold">Detalle de Objeto</h1>
 
-            {/* 🔍 Buscador */}
-            <div className="flex gap-2 max-w-sm">
-                <Input
-                    type="number"
-                    placeholder="Ingrese ID del objeto"
-                    value={objetoId}
-                    onChange={(e) => setObjetoId(e.target.value)}
-                />
-                <Button onClick={handleSearch}>
-                    <Search className="w-4 h-4 mr-1" />
-                    Buscar
-                </Button>
-            </div>
 
             {loading && <LoadingGrid type="grid" />}
             {error && <ErrorAlert title="Error" message={error} />}
             {!loading && !error && !objeto && (
-                <EmptyState message="Ingrese un ID para buscar un objeto." />
+                <EmptyState message="Ingrese un identificador para buscar un objeto." />
             )}
 
             {/* 📦 DETALLE DEL OBJETO */}
@@ -150,10 +149,10 @@ export default function DetailObjetos() {
                         <Table>
                             <TableHeader className="bg-primary/50">
                                 <TableRow>
-                                    <TableHead>ID Subasta</TableHead>
+                                    <TableHead>Numero Subasta</TableHead>
                                     <TableHead>Fecha Inicio</TableHead>
                                     <TableHead>Fecha Cierre</TableHead>
-                                    <TableHead>Estado</TableHead>
+                                    <TableHead>Estado Subasta</TableHead>
                                 </TableRow>
                             </TableHeader>
 

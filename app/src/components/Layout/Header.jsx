@@ -45,6 +45,11 @@ export default function Header() {
   ];
 
   const mantItems = [
+    //  {
+    //   title: "Objetos Mantenimiento",
+    //   href: "objeto/table",
+    //   icon: <Wrench className="h-4 w-4" />,
+    // },
     {
       title: "Usuarios",
       href: "/usuarios",

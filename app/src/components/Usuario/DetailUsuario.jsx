@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   Table,
   TableHeader,
@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Edit, ArrowLeft, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
 import { EmptyState } from "../ui/custom/EmptyState";
@@ -26,26 +26,28 @@ const usersColumns = [
   { key: "nombre_completo", label: "Nombre" },
   { key: "rol", label: "Rol" },
   { key: "estado", label: "Estado" },
-  { key: "cantidad_subastas_creadas", label: "Cantidad Subastas" },
-  { key: "cantidad_pujas_realizadas", label: "Cantidad Pujas" },
+  { key: "fecha_registro", label: "Fecha Registro" },
+  { key: "cantidad_subastas_creadas", label: "Subastas Creadas" },
+  { key: "cantidad_pujas_realizadas", label: "Pujas Realizadas" },
   { key: "actions", label: "Acciones" },
 ];
 
 export default function DetailUsuario() {
+  const { id } = useParams();
   const [userId, setUserId] = useState("");
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSearch = async () => {
-    if (!userId) return;
+    const fetchUser = async (idUser) => {
+        if (!idUser) return;
 
     setLoading(true);
     setError(null);
     setUsers([]);
 
     try {
-      const response = await UsuarioService.getUserById(userId);
+      const response = await UsuarioService.getUserById(idUser);
       const result = response.data;
 
       if (result?.success && result.data) {
@@ -61,24 +63,22 @@ export default function DetailUsuario() {
     }
   };
 
+   useEffect(() => {
+        if (id) {
+            setUserId(id);
+            fetchUser(id);
+        }
+    }, [id]);
+
+      const handleSearch = () => {
+        fetchUser(userId);
+    };
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-6">Detalle de Usuario</h1>
 
-      {/* 🔍 Buscador */}
-      <div className="flex gap-2 mb-6 max-w-sm">
-        <Input
-          type="number"
-          placeholder="Ingrese ID de usuario"
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-        />
-        <Button onClick={handleSearch}>
-          <Search className="w-4 h-4 mr-1" />
-          Buscar
-        </Button>
-      </div>
-
+   
       {loading && <LoadingGrid type="grid" />}
       {error && <ErrorAlert title="Error" message={error} />}
       {!loading && !error && users.length === 0 && (
@@ -104,6 +104,7 @@ export default function DetailUsuario() {
                   <TableCell>
                     {Number(user.estado) === 1 ? "Activo" : "Bloqueado"}
                   </TableCell>
+                  <TableCell>{user.fecha_registro}</TableCell>
                   <TableCell>{user.cantidad_subastas_creadas}</TableCell>
                   <TableCell>{user.cantidad_pujas_realizadas}</TableCell>
                   <TableCell>

@@ -81,13 +81,8 @@ export default function ListCardObjetos({ data }) {
                                 </div>
                             )}
 
-                            {/* Condición */}
-                            <p className="text-muted-foreground">
-                                Condición:{" "}
-                                <span className="font-medium text-foreground">
-                                    {condicionMap[item.condicion] || "No especificado"}
-                                </span>
-                            </p>
+                           
+                           
                         </CardContent>
 
                         {/* Acciones */}

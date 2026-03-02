@@ -13,6 +13,9 @@ import ListSubastasActivas from "./components/Subasta/ListSubastasActivas";
 import ListSubastasFinalizadas from "./components/Subasta/ListSubastasFinalizadas";
 import DetailSubasta from "./components/Subasta/DetailSubastas";
 import HistorialPujas from "./components/Pujas/HistorialPujas";
+import UpdateUsuarios from "./components/Usuario/UpdateUsuario";
+import CreateObjeto from './components/Objeto/CreateObjeto'
+//import UpdateObjeto from './components/Objeto/UpdateObjeto'
 
 
 const rutas = createBrowserRouter([
@@ -21,6 +24,10 @@ const rutas = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
 
+      // {path:"objetos/table", element: <TableObjeto/>},
+     // {path:"objetos/update/:id", element: <UpdateObjeto/>},
+      { path:"objetos/create", element: <CreateObjeto/>},
+      { path: "usuarios/update/:id", element: <UpdateUsuarios /> },
       { path: "subastas/activas", element: <ListSubastasActivas /> },
       { path: "subastas/finalizadas", element: <ListSubastasFinalizadas /> },
       { path: "subastas/:id", element: <DetailSubasta /> },

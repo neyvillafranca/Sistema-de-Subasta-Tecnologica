@@ -9,6 +9,14 @@ class UsuarioService {
     return axios.get(BASE_URL + '/' + UserId);
   }
 
+    updateUsuario(Usuario) {
+    return axios({
+      method: 'put',
+      url: BASE_URL,
+      data: JSON.stringify(Usuario)
+
+    })
+  }
 }
 
 export default new UsuarioService();

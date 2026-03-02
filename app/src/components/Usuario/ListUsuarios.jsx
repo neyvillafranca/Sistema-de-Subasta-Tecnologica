@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Edit, ArrowLeft } from "lucide-react";
+import { Edit, Trash2 , ArrowLeft, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
@@ -116,6 +116,19 @@ export default function TableUsers() {
                       <TooltipContent>Ver detalle</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
+
+                   <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button asChild variant="outline" size="icon" className="text-primary">
+                                <Link to={`/usuarios/update/${user.id_usuario}`}>
+                                    <Plus className="h-4 w-4" />
+                                </Link>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Editar Usuario</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
                 </TableCell>
               </TableRow>
             ))}
