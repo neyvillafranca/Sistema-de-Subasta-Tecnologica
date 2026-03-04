@@ -20,12 +20,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL + "imagen";
 class ImageService {
 
   createImage(formData){
-        return axios.post(BASE_URL,formData,{
-            headers:{
-                'Content-Type':'multipart/form-data;',
-                'Accept':'multipart/form-data'
-            }
-        })
+        return axios.post(BASE_URL,formData)
     } 
 
   getImagesByObjeto(idObjeto) {

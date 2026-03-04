@@ -160,7 +160,7 @@ class ObjetoModel
         return $vResultado;
     }
 
-    public function create($objeto)
+    /*public function create($objeto)
     {
         // 🔹 Validaciones de negocio
         if (empty($objeto->nombre)) {
@@ -173,14 +173,14 @@ class ObjetoModel
 
         if (empty($objeto->categorias) || count($objeto->categorias) < 1) {
             throw new Exception("Debe seleccionar al menos una categoría");
-        }
+        }*/
 
-        if (empty($objeto->imagenes) || count($objeto->imagenes) < 1) {
+        /*if (empty($objeto->imagenes) || count($objeto->imagenes) < 1) {
             throw new Exception("Debe agregar al menos una imagen");
-        }
+        }*/
 
         // 🔹 Usuario vendedor simulado
-        $idVendedor = $objeto->id_vendedor; // viene del controller como usuario actual
+        /*$idVendedor = $objeto->id_vendedor; // viene del controller como usuario actual
 
         // 🔹 Estado inicial activo (ej: 1)
         $estadoInicial = 1;
@@ -211,7 +211,49 @@ class ObjetoModel
         }
 
         return $this->get($idObjeto);
-    }
+    }*/
+    public function create($objeto)
+{
+    
+    
+
+    $idVendedor = $objeto->id_vendedor ?? 2;
+    $estadoInicial = 1;
+
+    // 🔹 Insertar objeto
+    $sql = "INSERT INTO objetos 
+        (id_vendedor, nombre, descripcion, condicion, idestadoobjeto, fecha_registro)
+        VALUES (
+            $idVendedor,
+            '$objeto->nombre',
+            '$objeto->descripcion',
+            '$objeto->condicion',
+            $estadoInicial,
+            NOW()
+        )";
+
+    $idObjeto = $this->enlace->executeSQL_DML_last($sql);
+
+    // 🔹 Insertar categorías (VALIDADO)
+    
+    foreach ($objeto->categorias as $categoriaId) {
+    $sqlCat = "
+        INSERT INTO categoria_objeto (idobjeto, idcategoria, descripcion)
+        VALUES (
+            $idObjeto,
+            $categoriaId,
+            'Categoría asociada al objeto'
+        )
+    ";
+    $this->enlace->executeSQL_DML($sqlCat);
+}
+
+    // 🔹 DEVOLVER ALGO SEGURO
+    return [
+        "success" => true,
+        "id_objeto" => $idObjeto
+    ];
+}
 
     public function update($objeto)
     {

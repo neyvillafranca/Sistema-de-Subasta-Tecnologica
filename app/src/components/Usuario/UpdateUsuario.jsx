@@ -16,6 +16,9 @@ export default function UpdateUsuario() {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const [usuarios, setUsuarios] = useState([]);
+  const [rolTexto, setRolTexto] = useState("");
+  const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [error, setError] = useState(null);
@@ -33,24 +36,70 @@ export default function UpdateUsuario() {
     },
   });
 
-  // 🔹 Cargar usuario por ID
+  /* ===================== LISTAR USUARIOS ===================== */
+  /*useEffect(() => {
+    const cargarUsuarios = async () => {
+      try {
+        const res = await UsuarioService.getUsuario();
+        if (res.data.success) {
+          setUsuarios(res.data.data);
+        }
+      } catch {
+        toast.error("Error al cargar usuarios");
+      }
+    };
+    cargarUsuarios();
+  }, []);*/
+
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const response = await UsuarioService.getUserById(id);
+      const result = response.data;
+
+      if (result.success) {
+        reset({
+          nombre_completo: result.data.nombre_completo,
+          email: result.data.email,
+          estado: result.data.estado,
+        });
+
+        
+        setRolTexto(result.data.rol?.nombre || "");
+      } else {
+        setError(result.message || "Usuario no encontrado");
+      }
+    } catch (err) {
+      setError(err.message || "Error al cargar usuario");
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  fetchUser();
+}, [id, reset]);
+  /* ===================== DETALLE DE USUARIO ===================== */
   useEffect(() => {
+    if (!id) return;
+
     const fetchUser = async () => {
       try {
         const response = await UsuarioService.getUserById(id);
         const result = response.data;
 
         if (result.success) {
+          setDetalle(result.data);
+
           reset({
             nombre_completo: result.data.nombre_completo,
             email: result.data.email,
             estado: result.data.estado,
           });
         } else {
-          setError(result.message || "Usuario no encontrado");
+          setError("Usuario no encontrado");
         }
-      } catch (err) {
-        setError(err.message || "Error al cargar usuario");
+      } catch {
+        setError("Error al cargar usuario");
       } finally {
         setLoadingData(false);
       }
@@ -59,7 +108,7 @@ export default function UpdateUsuario() {
     fetchUser();
   }, [id, reset]);
 
-  // 🔹 Update
+  /* ===================== UPDATE ===================== */
   const onSubmit = async (dataForm) => {
     try {
       setLoading(true);
@@ -71,11 +120,7 @@ export default function UpdateUsuario() {
         estado: Number(dataForm.estado),
       };
 
-      console.log("DATA ENVIADA:", dataToSend);
-
       const response = await UsuarioService.updateUsuario(dataToSend);
-
-      console.log("RESPONSE COMPLETO:", response.data);
 
       if (response.data) {
         toast.success("Usuario actualizado correctamente");
@@ -83,99 +128,101 @@ export default function UpdateUsuario() {
       } else {
         toast.error("No se pudo actualizar el usuario");
       }
-
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Error del servidor");
     } finally {
       setLoading(false);
     }
   };
 
-  if (loadingData) return <p className="text-center mt-10">Cargando usuario...</p>;
+  if (loadingData) return <p className="text-center mt-10">Cargando...</p>;
   if (error) return <p className="text-red-500 text-center mt-10">{error}</p>;
 
   return (
-    <Card className="p-6 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Editar Usuario</h2>
+    <Card className="p-6 max-w-2xl mx-auto mt-6">
+      <h2 className="text-2xl font-bold mb-6">Administración de Usuarios</h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      
 
-        {/* Nombre */}
-        <div>
-          <Label>Nombre Completo</Label>
-          <Controller
-            name="nombre_completo"
-            control={control}
-            rules={{ required: "El nombre es requerido" }}
-            render={({ field }) => (
-              <Input {...field} placeholder="Nombre completo" />
+      {/* ===================== FORMULARIO ===================== */}
+      {detalle && (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+          {/* Nombre */}
+          <div>
+            <Label>Nombre Completo</Label>
+            <Controller
+              name="nombre_completo"
+              control={control}
+              rules={{ required: "El nombre es requerido" }}
+              render={({ field }) => <Input {...field} />}
+            />
+            {errors.nombre_completo && (
+              <p className="text-red-500 text-sm">
+                {errors.nombre_completo.message}
+              </p>
             )}
-          />
-          {errors.nombre_completo && (
-            <p className="text-red-500 text-sm">
-              {errors.nombre_completo.message}
-            </p>
-          )}
-        </div>
+          </div>
 
-        {/* Email */}
-        <div>
-          <Label>Email</Label>
-          <Controller
-            name="email"
-            control={control}
-            rules={{ required: "El email es requerido" }}
-            render={({ field }) => (
-              <Input type="email" {...field} placeholder="Correo electrónico" />
+          {/* Email */}
+          <div>
+            <Label>Email</Label>
+            <Controller
+              name="email"
+              control={control}
+              rules={{ required: "El email es requerido" }}
+              render={({ field }) => <Input type="email" {...field} />}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">
+                {errors.email.message}
+              </p>
             )}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
+          </div>
 
-        {/* Estado */}
-        <div>
-          <Label>Estado</Label>
-          <Controller
-            name="estado"
-            control={control}
-            rules={{ required: "Seleccione estado" }}
-            render={({ field }) => (
-              <select
-                {...field}
-                className="w-full border rounded-md p-2"
-              >
-                <option value="">Seleccione</option>
-                <option value={1}>Activo</option>
-                <option value={0}>Bloqueado</option>
-              </select>
-            )}
-          />
-          {errors.estado && (
-            <p className="text-red-500 text-sm">
-              {errors.estado.message}
-            </p>
-          )}
-        </div>
+          {/* Rol (solo lectura) */}
+          <div>
+            
+            <Label>Rol</Label>
+            <Input value={rolTexto} disabled />
+          </div>
 
-        {/* Botones */}
-        <div className="flex justify-between">
-          <Button type="button" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Regresar
-          </Button>
+          {/* Fecha registro (solo lectura) */}
+          <div>
+            <Label>Fecha de Registro</Label>
+            <Input value={detalle.fecha_registro || ""} disabled />
+          </div>
 
-          <Button type="submit" disabled={loading}>
-            <Save className="w-4 h-4 mr-2" />
-            {loading ? "Guardando..." : "Guardar Cambios"}
-          </Button>
-        </div>
+          {/* Estado */}
+          <div>
+            <Label>Estado</Label>
+            <Controller
+              name="estado"
+              control={control}
+              rules={{ required: "Seleccione estado" }}
+              render={({ field }) => (
+                <select {...field} className="w-full border rounded-md p-2">
+                  <option value={1}>Activo</option>
+                  <option value={0}>Bloqueado</option>
+                </select>
+              )}
+            />
+          </div>
 
-      </form>
+          {/* Botones */}
+          <div className="flex justify-between pt-4">
+            <Button type="button" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Regresar
+            </Button>
+
+            <Button type="submit" disabled={loading}>
+              <Save className="w-4 h-4 mr-2" />
+              {loading ? "Guardando..." : "Guardar Cambios"}
+            </Button>
+          </div>
+        </form>
+      )}
     </Card>
   );
 }
