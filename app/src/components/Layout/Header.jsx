@@ -38,7 +38,7 @@ export default function Header() {
   const navItems = [
     { title: "Articulos Tecnologicos", href: "/movie", icon: <Film className="h-4 w-4" /> },
     {
-      title: "Filtrar Películas",
+      title: "Filtrar Articulos",
       href: "/movie/filter",
       icon: <Filter className="h-4 w-4" />,
     },
@@ -56,18 +56,8 @@ export default function Header() {
       icon: <Wrench className="h-4 w-4" />,
     },
     {
-      title: "Detalles Usuarios",
-      href: "/usuarios/detail",
-      icon: <Wrench className="h-4 w-4" />,
-    },
-    {
       title: "Objetos",
       href: "/objetos",
-      icon: <Wrench className="h-4 w-4" />,
-    },
-    {
-      title: "Detalles Objetos",
-      href: "/objetos/detail",
       icon: <Wrench className="h-4 w-4" />,
     },
     {
@@ -80,21 +70,7 @@ export default function Header() {
       href: "/subastas/finalizadas",
       icon: <Wrench className="h-4 w-4" />,
     },
-    {
-      title: "Detalle Subasta",
-      href: "/subastas/detail",
-      icon: <Wrench className="h-4 w-4" />,
-    },
-    {
-      title: "Alquileres",
-      href: "rental",
-      icon: <ShoppingBasket className="h-4 w-4" />,
-    },
-    {
-      title: "Gráfico de Alquileres",
-      href: "/rental/graph",
-      icon: <ChartArea className="h-4 w-4" />,
-    },
+   
   ];
 
   const userItems = [
@@ -120,16 +96,16 @@ export default function Header() {
           className="flex items-center gap-2 text-xl font-semibold tracking-wide hover:opacity-90 transition"
         >
           <Clapperboard className="h-6 w-6" />
-          <span className="hidden sm:inline">MoviesApp</span>
+          <span className="hidden sm:inline">SubastaTec</span>
         </Link>
 
         {/* -------- Menú escritorio -------- */}
         <div className="hidden md:flex flex-1 justify-center">
           <Menubar className="w-auto bg-transparent border-none shadow-none space-x-6">
-            {/* Películas */}
+            {/* Ariticulos */}
             <MenubarMenu>
               <MenubarTrigger className="text-white font-medium flex items-center gap-1 hover:text-secondary transition">
-                <Film className="h-4 w-4" /> Películas
+                <Film className="h-4 w-4" /> Articulos
                 <ChevronDown className="h-3 w-3" />
               </MenubarTrigger>
               <MenubarContent className="bg-primary/0 backdrop-blur-md border-white/10">
@@ -212,13 +188,13 @@ export default function Header() {
               <nav className="mt-8 px-4 space-y-6">
                 <div>
                   <Link to="/" className="flex items-center gap-2 text-lg font-semibold">
-                    <Clapperboard /> MoviesApp
+                    <Clapperboard /> SubastaTec
                   </Link>
                 </div>
 
                 <div>
                   <h4 className="mb-2 text-lg font-semibold flex items-center gap-2">
-                    <Film /> Películas
+                    <Film /> Articulos
                   </h4>
                   {navItems.map((item) => (
                     <Link

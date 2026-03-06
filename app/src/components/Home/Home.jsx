@@ -1,4 +1,4 @@
-import ticketImg from "../../assets/ticket.jpg";
+import ticketImg from "../../assets/objstec.jpg";
 
 
 export function Home() {
@@ -18,17 +18,17 @@ export function Home() {
       {/* Contenido principal */}
       <div className="px-4 max-w-2xl text-white">
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight mb-4 drop-shadow-lg">
-          Alquiler de Películas
+          Subastas de Objetos tecnologicos
         </h1>
         <p className="text-lg md:text-xl text-white/80 mb-6 drop-shadow">
-          Descubre y alquila tus películas favoritas por días.
+          Descubre las mejores ofertas en articulos subastables.
         </p>
         <div className="flex justify-center gap-4">
           <a
             href="/movies"
             className="px-6 py-3 bg-primary text-white rounded-lg font-semibold shadow-lg hover:bg-primary/90 transition"
           >
-            Ver Catálogo
+            Ver subastas
           </a> 
           <a
             href="/user/login"
