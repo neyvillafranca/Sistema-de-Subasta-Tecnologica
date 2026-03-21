@@ -6,7 +6,9 @@ class ObjetoService {
   getObjetos() {
     return axios.get(BASE_URL);
   }
-
+  getObjetosActivos() {
+  return axios.get(`${BASE_URL}/activosDisponibles`);
+}
   getObjetoById(id) {
     return axios.get(`${BASE_URL}/${id}`);
   }
@@ -32,7 +34,10 @@ class ObjetoService {
     return axios.post(BASE_URL, JSON.stringify(objeto));
   }
 
-  updateObjeto(objeto) {
+ /*updateObjeto(objeto) {
+  return axios.put(BASE_URL, objeto);
+}*/
+updateObjeto(objeto) {
     return axios({
       method: 'put',
       url: BASE_URL,

@@ -24,7 +24,7 @@ class ImageService {
     } 
 
   getImagesByObjeto(idObjeto) {
-    return axios.get(`${BASE_URL}/${idObjeto}`);
+    return axios.get(`${BASE_URL}${idObjeto}`);
   }
 
 }

@@ -15,7 +15,41 @@ class Subasta
         }
     }
     
+    public function create()
+{
+    try {
+        $request = new Request();
+        $response = new Response();
+        $model = new SubastaModel();
 
+        $inputJSON = $request->getJSON();
+        $result = $model->create($inputJSON);
+
+        $response->toJSON($result);
+    } catch (Exception $e) {
+        handleException($e);
+    }
+}
+
+public function update()
+    {
+        try {
+            $request  = new Request();
+            $response = new Response();
+
+            $inputJSON = $request->getJSON();
+
+            $model = new SubastaModel();
+
+            $result = $model->update($inputJSON);
+
+            $response->toJSON($result);
+
+        } catch (Exception $e) {
+            $response->toJSON(null);
+            handleException($e);
+        }
+    }
     /**
      * GET /subasta/activas
      * Listado subastas activas + cantidad de pujas (campo calculado)
@@ -50,6 +84,32 @@ class Subasta
         }
     }
 
+    public function previas()
+    {
+        try {
+            $response = new Response();
+            $model    = new SubastaModel();
+            $result   = $model->getPrevias();
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            $response->toJSON(null);
+            handleException($e);
+        }
+    }
+
+    public function canceladas()
+    {
+        try {
+            $response = new Response();
+            $model    = new SubastaModel();
+            $result   = $model->getCanceladas();
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            $response->toJSON(null);
+            handleException($e);
+        }
+    }
+
     /**
      * GET /subasta/{id}
      * Detalle: datos del objeto + datos de la subasta + cantidad_pujas
@@ -67,7 +127,30 @@ class Subasta
         }
     }
 
-
+public function publicar($idSubasta)
+    {
+        try {
+            $response = new Response();
+            $model    = new SubastaModel();
+            $result   = $model->publicar($idSubasta);
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            $response->toJSON(null);
+            handleException($e);
+        }
+    }
+public function cancelar($idSubasta)
+    {
+        try {
+            $response = new Response();
+            $model    = new SubastaModel();
+            $result   = $model->cancelar($idSubasta);
+            $response->toJSON($result);
+        } catch (Exception $e) {
+            $response->toJSON(null);
+            handleException($e);
+        }
+    }
 
     /**
      * GET /subasta/pujas/{id_subasta}

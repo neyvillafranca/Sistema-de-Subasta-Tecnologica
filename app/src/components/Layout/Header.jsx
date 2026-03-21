@@ -61,6 +61,11 @@ export default function Header() {
       icon: <Wrench className="h-4 w-4" />,
     },
     {
+      title: "Crear Objeto",
+      href: "/objetos/create",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
       title: "Objetos",
       href: "/objetos",
       icon: <Wrench className="h-4 w-4" />,
@@ -68,6 +73,16 @@ export default function Header() {
     {
       title: "Detalles Objetos",
       href: "/objetos/detail",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      title: "Crear Subasta",
+      href: "/subastas/create",
+      icon: <Wrench className="h-4 w-4" />,
+    },
+    {
+      title: "Subastas Previas",
+      href: "/subastas/previas",
       icon: <Wrench className="h-4 w-4" />,
     },
     {

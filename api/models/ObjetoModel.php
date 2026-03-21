@@ -88,7 +88,7 @@ class ObjetoModel
         return null;
     }
 
-    private function getHistorialSubastas($id_objeto)
+    /*private function getHistorialSubastas($id_objeto)
     {
         $estadoSubasta = new EstadoSubastaModel();
 
@@ -111,7 +111,37 @@ class ObjetoModel
         }
 
         return $resultado ?: [];
+    }*/
+        private function getHistorialSubastas($id_objeto)
+{
+    $estadoSubasta = new EstadoSubastaModel();
+    $id_objeto = intval($id_objeto);
+
+    $vSql = "
+        SELECT 
+            s.id_subasta,
+            s.fecha_inicio,
+            s.fecha_cierre,
+            s.idestado
+        FROM subastas s
+        WHERE s.id_objeto = $id_objeto
+        ORDER BY s.fecha_inicio DESC
+    ";
+
+    $resultado = $this->enlace->ExecuteSQL($vSql);
+
+    if (!empty($resultado) && is_array($resultado)) {
+
+        for ($i = 0; $i < count($resultado); $i++) {
+
+            // ✅ AQUÍ ESTÁ LA CORRECCIÓN
+            $resultado[$i]->estado_subasta =
+                $estadoSubasta->getEstadoSubasta($resultado[$i]->idestado);
+        }
     }
+
+    return $resultado ?: [];
+}
 
     /**
      * Obtener las peliculas por tienda
@@ -160,82 +190,24 @@ class ObjetoModel
         return $vResultado;
     }
 
-    /*public function create($objeto)
-    {
-        // 🔹 Validaciones de negocio
-        if (empty($objeto->nombre)) {
-            throw new Exception("Nombre requerido");
-        }
-
-        if (strlen($objeto->descripcion) < 20) {
-            throw new Exception("Descripción mínima 20 caracteres");
-        }
-
-        if (empty($objeto->categorias) || count($objeto->categorias) < 1) {
-            throw new Exception("Debe seleccionar al menos una categoría");
-        }*/
-
-        /*if (empty($objeto->imagenes) || count($objeto->imagenes) < 1) {
-            throw new Exception("Debe agregar al menos una imagen");
-        }*/
-
-        // 🔹 Usuario vendedor simulado
-        /*$idVendedor = $objeto->id_vendedor; // viene del controller como usuario actual
-
-        // 🔹 Estado inicial activo (ej: 1)
-        $estadoInicial = 1;
-
-        $sql = "INSERT INTO objetos 
-            (id_vendedor, nombre, descripcion, condicion, idestadoobjeto)
-            VALUES 
-            ($idVendedor,
-            '$objeto->nombre',
-            '$objeto->descripcion',
-            $objeto->condicion,
-            $estadoInicial)";
-
-        $idObjeto = $this->enlace->executeSQL_DML_last($sql);
-
-        // 🔹 Insertar categorías
-        foreach ($objeto->categorias as $categoria) {
-            $sql = "INSERT INTO categoria_objeto (idobjeto, idcategoria)
-                VALUES ($idObjeto, $categoria)";
-            $this->enlace->executeSQL_DML($sql);
-        }
-
-        // 🔹 Insertar imágenes
-        foreach ($objeto->imagenes as $imagen) {
-            $sql = "INSERT INTO imagenes_objeto (url_imagen, objetos_id_objeto)
-                VALUES ('$imagen', $idObjeto)";
-            $this->enlace->executeSQL_DML($sql);
-        }
-
-        return $this->get($idObjeto);
-    }*/
     public function create($objeto)
-{
-    
-    
-
+    {
     $idVendedor = $objeto->id_vendedor ?? 2;
-    $estadoInicial = 1;
 
-    // 🔹 Insertar objeto
     $sql = "INSERT INTO objetos 
         (id_vendedor, nombre, descripcion, condicion, idestadoobjeto, fecha_registro)
-        VALUES (
+        SELECT
             $idVendedor,
             '$objeto->nombre',
             '$objeto->descripcion',
             '$objeto->condicion',
-            $estadoInicial,
+            idestadoobjeto,
             NOW()
-        )";
+        FROM estado_objeto
+        WHERE descripcion = 'Registrado'";
 
     $idObjeto = $this->enlace->executeSQL_DML_last($sql);
 
-    // 🔹 Insertar categorías (VALIDADO)
-    
     foreach ($objeto->categorias as $categoriaId) {
     $sqlCat = "
         INSERT INTO categoria_objeto (idobjeto, idcategoria, descripcion)
@@ -248,86 +220,199 @@ class ObjetoModel
     $this->enlace->executeSQL_DML($sqlCat);
 }
 
-    // 🔹 DEVOLVER ALGO SEGURO
+    // DEVOLVER ALGO SEGURO
     return [
         "success" => true,
         "id_objeto" => $idObjeto
     ];
 }
 
-    public function update($objeto)
-    {
-        // 🔹 Verificar si está en subasta activa
-        $sqlValidar = "SELECT COUNT(*) as total
-                   FROM subastas s
-                   WHERE s.id_objeto = $objeto->id_objeto
-                   AND s.idestado = 1"; // 1 = activa
+    /*public function update($objeto)
+{
+    $idObjeto = intval($objeto->id_objeto ?? $objeto->id);
 
-        $res = $this->enlace->ExecuteSQL($sqlValidar);
+    // Validar subasta activa
+    $sqlValidar = "SELECT COUNT(*) as total
+                   FROM subastas
+                   WHERE id_objeto = $idObjeto
+                   AND idestado = (
+                        SELECT idestado 
+                        FROM estado_subasta 
+                        WHERE descripcion = 'Activa'
+                   )";
 
-        if ($res[0]->total > 0) {
-            throw new Exception("No se puede editar. El objeto está en subasta activa.");
-        }
+    $res = $this->enlace->ExecuteSQL($sqlValidar);
 
-        // 🔹 Update objeto
-        $sql = "UPDATE objetos SET
+    if ($res[0]->total > 0) {
+        throw new Exception("No se puede editar. El objeto está en subasta activa.");
+    }
+
+    // Actualizar objeto
+    $sql = "UPDATE objetos SET
             nombre = '$objeto->nombre',
             descripcion = '$objeto->descripcion',
-            condicion = $objeto->condicion
-            WHERE id_objeto = $objeto->id_objeto";
+            condicion = '$objeto->condicion'
+            WHERE id_objeto = $idObjeto";
 
-        $this->enlace->executeSQL_DML($sql);
+    $this->enlace->executeSQL_DML($sql);
 
-        // 🔹 Eliminar categorías anteriores
-        $sql = "DELETE FROM categoria_objeto
-            WHERE idobjeto = $objeto->id_objeto";
-        $this->enlace->executeSQL_DML($sql);
+    // Eliminar categorías anteriores
+    $sqlDeleteCat = "DELETE FROM categoria_objeto
+                     WHERE idobjeto = $idObjeto";
+    $this->enlace->executeSQL_DML($sqlDeleteCat);
 
-        // 🔹 Insertar nuevas categorías
-        foreach ($objeto->categorias as $categoria) {
-            $sql = "INSERT INTO categoria_objeto (idobjeto, idcategoria)
-                VALUES ($objeto->id_objeto, $categoria)";
-            $this->enlace->executeSQL_DML($sql);
+    // Insertar nuevas categorías
+    if (!empty($objeto->categoria)) {
+        foreach ($objeto->categoria as $categoria) {
+$idCategoria = intval($categoria->id_categoria);
+            $sqlInsertCat = "INSERT INTO categoria_objeto
+                            (idobjeto, idcategoria, descripcion)
+                            VALUES
+                            ($idObjeto, $idCategoria, 'Categoría modificada')";
+            
+            $this->enlace->executeSQL_DML($sqlInsertCat);
         }
-
-        // 🔹 Eliminar imágenes anteriores
-        $sql = "DELETE FROM imagenes_objeto
-            WHERE objetos_id_objeto = $objeto->id_objeto";
-        $this->enlace->executeSQL_DML($sql);
-
-        // 🔹 Insertar nuevas imágenes
-        foreach ($objeto->imagenes as $imagen) {
-            $sql = "INSERT INTO imagenes_objeto (url_imagen, objetos_id_objeto)
-                VALUES ('$imagen', $objeto->id_objeto)";
-            $this->enlace->executeSQL_DML($sql);
-        }
-
-        return $this->get($objeto->id_objeto);
     }
 
-    public function delete($id)
-    {
-        // Verificar si tiene subastas
-        $sql = "SELECT COUNT(*) as total
-            FROM subastas
-            WHERE id_objeto = $id";
+    // NO eliminamos imágenes aquí para no romper lo que ya funciona
 
-        $res = $this->enlace->ExecuteSQL($sql);
+    return $this->get($idObjeto);
+}*/
+public function update($objeto)
+{
+    $idObjeto = intval($objeto->id_objeto ?? $objeto->id);
 
-        if ($res[0]->total > 0) {
-            throw new Exception("No se puede eliminar. El objeto ya fue subastado.");
-        }
+    /* ================= VALIDAR SUBASTA ACTIVA ================= */
 
-        // Eliminación lógica → cambiar estado
-        $sql = "UPDATE objetos
-            SET idestadoobjeto = 0
-            WHERE id_objeto = $id";
+    $sqlValidar = "
+        SELECT COUNT(*) as total
+        FROM subastas
+        WHERE id_objeto = $idObjeto
+        AND idestado = (
+            SELECT idestado 
+            FROM estado_subasta 
+            WHERE descripcion = 'Activa'
+        )
+    ";
 
-        $this->enlace->executeSQL_DML($sql);
+    $res = $this->enlace->ExecuteSQL($sqlValidar);
 
-        return true;
+    if ($res[0]->total > 0) {
+        throw new Exception("No se puede editar. El objeto está en subasta activa.");
     }
 
+    /* ================= OBTENER ESTADO ACTUAL ================= */
+
+    $resEstadoActual = $this->enlace->ExecuteSQL("
+        SELECT eo.descripcion
+        FROM objetos o
+        INNER JOIN estado_objeto eo 
+            ON eo.idestadoobjeto = o.idestadoobjeto
+        WHERE o.id_objeto = $idObjeto
+        LIMIT 1
+    ");
+
+    if (empty($resEstadoActual)) {
+        throw new Exception("Objeto no encontrado");
+    }
+
+    $estadoActual = $resEstadoActual[0]->descripcion;
+
+    /* ================= DEFINIR ESTADO A GUARDAR ================= */
+
+    $idEstadoFinal = null;
+
+    if ($estadoActual === 'Inactivo') {
+
+        // Si está Inactivo → volver a Registrado
+        $resRegistrado = $this->enlace->ExecuteSQL("
+            SELECT idestadoobjeto 
+            FROM estado_objeto 
+            WHERE descripcion = 'Registrado'
+            LIMIT 1
+        ");
+
+        $idEstadoFinal = $resRegistrado[0]->idestadoobjeto;
+
+    } else {
+        // Si ya está Registrado u otro → no cambiar estado
+        $resEstado = $this->enlace->ExecuteSQL("
+            SELECT idestadoobjeto 
+            FROM objetos 
+            WHERE id_objeto = $idObjeto
+            LIMIT 1
+        ");
+
+        $idEstadoFinal = $resEstado[0]->idestadoobjeto;
+    }
+
+    /* ================= ACTUALIZAR OBJETO ================= */
+
+    $sqlUpdate = "
+        UPDATE objetos SET
+            nombre = '$objeto->nombre',
+            descripcion = '$objeto->descripcion',
+            condicion = '$objeto->condicion',
+            idestadoobjeto = $idEstadoFinal
+        WHERE id_objeto = $idObjeto
+    ";
+
+    $this->enlace->executeSQL_DML($sqlUpdate);
+
+    /* ================= CATEGORÍAS ================= */
+
+    // Eliminar categorías anteriores
+    $this->enlace->executeSQL_DML("
+        DELETE FROM categoria_objeto 
+        WHERE idobjeto = $idObjeto
+    ");
+
+    // Insertar nuevas categorías
+    if (!empty($objeto->categoria)) {
+        foreach ($objeto->categoria as $categoria) {
+            $idCategoria = intval($categoria->id_categoria);
+
+            $this->enlace->executeSQL_DML("
+                INSERT INTO categoria_objeto (idobjeto, idcategoria, descripcion)
+                VALUES ($idObjeto, $idCategoria, 'Categoría modificada')
+            ");
+        }
+    }
+
+    /* ================= RETORNAR OBJETO ACTUALIZADO ================= */
+
+    return $this->get($idObjeto);
+}
+
+public function delete($id)
+{
+    $id = intval($id);
+
+    // Obtener objeto
+    $res = $this->enlace->ExecuteSQL("SELECT * FROM objetos WHERE id_objeto = $id");
+    $objeto = $res[0];
+
+    // Obtener id del estado 'Registrado' dinámicamente
+    $resEstado = $this->enlace->ExecuteSQL(
+        "SELECT idestadoobjeto FROM estado_objeto WHERE descripcion='Registrado' LIMIT 1"
+    );
+    $idRegistrado = $resEstado[0]->idestadoobjeto;
+    // Verificar subastas activas o finalizadas
+    $resSubasta = $this->enlace->ExecuteSQL(
+        "SELECT COUNT(*) as total FROM subastas WHERE id_objeto=$id
+         AND idestado IN (SELECT idestado FROM estado_subasta WHERE descripcion IN ('Activa','Finalizada'))"
+    );
+
+    // Cambiar estado a Inactivo
+    $resInactivo = $this->enlace->ExecuteSQL(
+        "SELECT idestadoobjeto FROM estado_objeto WHERE descripcion='Inactivo' LIMIT 1"
+    );
+    $idInactivo = $resInactivo[0]->idestadoobjeto;
+
+    $this->enlace->executeSQL_DML("UPDATE objetos SET idestadoobjeto=$idInactivo WHERE id_objeto=$id");
+
+    return true;
+}
     public function changeEstado($id, $estado)
     {
         $sql = "UPDATE objetos
@@ -338,6 +423,43 @@ class ObjetoModel
 
         return $this->get($id);
     }
+
+    public function getObjetosActivosDisponibles()
+{
+    $imagenM = new ImagenModel();
+    $categoriaM = new CategoriaModel();
+    $estadoM = new EstadoObjetoModel();
+
+    $sql = "
+        SELECT o.*
+        FROM objetos o
+        WHERE o.idestadoobjeto = (
+            SELECT idestadoobjeto 
+            FROM estado_objeto 
+            WHERE descripcion = 'Registrado'
+        )
+        ORDER BY o.nombre ASC
+    ";
+
+    $resultado = $this->enlace->ExecuteSQL($sql);
+
+    if (!empty($resultado) && is_array($resultado)) {
+        for ($i = 0; $i < count($resultado); $i++) {
+            $idObjeto = $resultado[$i]->id_objeto;
+
+            // Imagen
+            $resultado[$i]->imagen = $imagenM->getImagenObjeto($idObjeto);
+
+            // Categorías
+            $resultado[$i]->categoria = $categoriaM->getCategoriaObjeto($idObjeto);
+
+            // Estado
+            $resultado[$i]->estado = $estadoM->getEstadoObjeto($idObjeto);
+        }
+    }
+
+    return $resultado ?: [];
+}
     /**
      * Crear pelicula
      * @param $objeto pelicula a insertar

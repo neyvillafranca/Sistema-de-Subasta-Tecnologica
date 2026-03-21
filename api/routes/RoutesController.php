@@ -140,26 +140,40 @@ class RoutesController
                         break;
 
                     case 'PUT':
-                    case 'PATCH':
-                        if ($param1) {
-                            $response->update($param1);
-                        } elseif ($action && method_exists($response, $action)) {
-                            $response->$action();
-                        } else {
-                            $response->update();
-                        }
-                        break;
-
-                    case 'DELETE':
-                        if ($param1) {
-                            $response->delete($param1);
-                        } elseif ($action && method_exists($response, $action)) {
-                            $response->$action();
-                        } else {
-                            $response->delete();
-                        }
-                        break;
-
+case 'PATCH':
+    if ($action && method_exists($response, $action)) {
+        // URL tipo /subasta/publicar/11  → llama publicar(11)
+        if ($param1) {
+            $response->$action($param1);
+        } else {
+            $response->$action();
+        }
+    } elseif ($param1) {
+        // URL tipo /subasta/11  → llama update(11)
+        $response->update($param1);
+    } elseif ($action && is_numeric($action)) {
+        // URL tipo /subasta/11  → llama update(11)
+        $response->update($action);
+    } else {
+        $response->update();
+    }
+    break;
+case 'DELETE':
+    if ($action && is_numeric($action)) {
+        // URL tipo /objeto/5
+        $response->delete($action);
+    } elseif ($param1) {
+        // URL tipo /objeto/delete/5
+        $response->delete($param1);
+    } else {
+        $json = [
+            "success" => false,
+            "status"  => 400,
+            "message" => 'ID requerido para eliminar'
+        ];
+        echo json_encode($json, http_response_code($json["status"]));
+    }
+    break;
                     default:
                         $json = [
                             "success" => false,

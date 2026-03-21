@@ -30,7 +30,7 @@ class EstadoSubastaModel
         return $vResultado[0];
     }
 
-    public function getEstadoSubasta($idObj)
+    /*public function getEstadoSubasta($idObj)
     {
         //Consulta sql
 
@@ -42,5 +42,33 @@ class EstadoSubastaModel
         $vResultado = $this->enlace->ExecuteSQL($vSql);
         // Retornar el objeto
         return $vResultado[0];
+    }*/
+    /*public function getEstadoSubasta($idestado)
+    {
+        $idestado = intval($idestado);
+
+        $sql = "SELECT *
+                FROM estado_subasta
+                WHERE idestado = $idestado
+                LIMIT 1";
+
+        $resultado = $this->enlace->ExecuteSQL($sql);
+
+        // ✅ VALIDACIÓN DEFENSIVA (CLAVE)
+        if (empty($resultado)) {
+            return null;
+        }
+
+        return $resultado[0];
+    }*/
+    public function getEstadoSubasta($idEstado)
+    {
+        $db = new MySqlConnect();
+        $idEstado = intval($idEstado);
+
+        $sql = "SELECT * FROM estado_subasta WHERE idestado = $idEstado LIMIT 1";
+        $res = $db->ExecuteSQL($sql);
+
+        return $res[0] ?? null;
     }
 }

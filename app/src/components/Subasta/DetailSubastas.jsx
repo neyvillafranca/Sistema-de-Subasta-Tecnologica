@@ -25,7 +25,7 @@ export default function DetailSubasta() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL  + "uploads";
 
 
     const fetchSubasta = async (idSubasta) => {
@@ -84,13 +84,13 @@ export default function DetailSubasta() {
                     <div className="grid sm:grid-cols-2 gap-6">
                         {objeto?.imagenes?.length > 0 ? (
                             <img
-                                src={`${BASE_URL}${objeto.imagenes[0].url_imagen}`}
+                                src={`${BASE_URL}/${objeto.imagenes[0].url_imagen}`}
                                 alt={objeto.nombre}
                                 className="rounded-md border object-cover"
                             />
                         ) : objeto?.imagen?.url_imagen ? (
                             <img
-                                src={`${BASE_URL}${objeto.imagen.url_imagen}`}
+                                src={`${BASE_URL}/${objeto.imagen.url_imagen}`}
                                 alt={objeto.nombre}
                                 className="rounded-md border object-cover"
                             />

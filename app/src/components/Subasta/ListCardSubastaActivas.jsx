@@ -15,7 +15,7 @@ ListCardSubastaActivas.propTypes = {
 };
 
 export default function ListCardSubastaActivas({ data }) {
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL  + "uploads";
 
     return (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -36,7 +36,7 @@ export default function ListCardSubastaActivas({ data }) {
                         <div className="relative w-full aspect-video">
                             {subasta.objeto?.imagen?.url_imagen ? (
                                 <img
-                                    src={`${BASE_URL}${subasta.objeto.imagen.url_imagen}`}
+                                    src={`${BASE_URL}/${subasta.objeto.imagen.url_imagen}`}
                                     alt={subasta.objeto.nombre}
                                     className="h-full w-full object-cover"
                                 />
@@ -77,6 +77,11 @@ export default function ListCardSubastaActivas({ data }) {
 
                         {/* Acción */}
                         <div className="border-t p-3 flex justify-end">
+                             <Button size="sm" asChild>
+                                <Link to={`/subastas/cancelar/${subasta.id_subasta}`}>
+                                    Cancelar Subasta
+                                </Link>
+                            </Button>
                             <Button size="sm" asChild>
                                 <Link to={`/subastas/${subasta.id_subasta}`}>
                                     Ver subasta

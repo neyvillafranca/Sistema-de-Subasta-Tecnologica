@@ -122,6 +122,26 @@ class Objeto
             handleException($e);
         }
     }
+
+/**
+ * GET /objeto/activos-disponibles
+ * Objetos activos sin subasta activa
+ */
+public function activosDisponibles()
+{
+    try {
+        $response = new Response();
+        $model    = new ObjetoModel();
+
+        $result = $model->getObjetosActivosDisponibles();
+
+        $response->toJSON($result);
+
+    } catch (Exception $e) {
+        $response->toJSON(null);
+        handleException($e);
+    }
+}
     //POST Crear
     // public function create()
     // {

@@ -16,7 +16,6 @@ export default function UpdateUsuario() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [usuarios, setUsuarios] = useState([]);
   const [rolTexto, setRolTexto] = useState("");
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -36,52 +35,8 @@ export default function UpdateUsuario() {
     },
   });
 
-  /* ===================== LISTAR USUARIOS ===================== */
-  /*useEffect(() => {
-    const cargarUsuarios = async () => {
-      try {
-        const res = await UsuarioService.getUsuario();
-        if (res.data.success) {
-          setUsuarios(res.data.data);
-        }
-      } catch {
-        toast.error("Error al cargar usuarios");
-      }
-    };
-    cargarUsuarios();
-  }, []);*/
-
-useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const response = await UsuarioService.getUserById(id);
-      const result = response.data;
-
-      if (result.success) {
-        reset({
-          nombre_completo: result.data.nombre_completo,
-          email: result.data.email,
-          estado: result.data.estado,
-        });
-
-        
-        setRolTexto(result.data.rol?.nombre || "");
-      } else {
-        setError(result.message || "Usuario no encontrado");
-      }
-    } catch (err) {
-      setError(err.message || "Error al cargar usuario");
-    } finally {
-      setLoadingData(false);
-    }
-  };
-
-  fetchUser();
-}, [id, reset]);
-  /* ===================== DETALLE DE USUARIO ===================== */
+  /* ===================== CARGAR USUARIO ===================== */
   useEffect(() => {
-    if (!id) return;
-
     const fetchUser = async () => {
       try {
         const response = await UsuarioService.getUserById(id);
@@ -89,6 +44,7 @@ useEffect(() => {
 
         if (result.success) {
           setDetalle(result.data);
+          setRolTexto(result.data.rol?.nombre || "");
 
           reset({
             nombre_completo: result.data.nombre_completo,
@@ -98,7 +54,7 @@ useEffect(() => {
         } else {
           setError("Usuario no encontrado");
         }
-      } catch {
+      } catch (err) {
         setError("Error al cargar usuario");
       } finally {
         setLoadingData(false);
@@ -122,11 +78,13 @@ useEffect(() => {
 
       const response = await UsuarioService.updateUsuario(dataToSend);
 
-      if (response.data) {
+      if (response.data?.success) {
         toast.success("Usuario actualizado correctamente");
         navigate("/usuarios");
       } else {
-        toast.error("No se pudo actualizar el usuario");
+        toast.error(
+          response.data?.message || "No se pudo actualizar el usuario"
+        );
       }
     } catch {
       toast.error("Error del servidor");
@@ -140,11 +98,10 @@ useEffect(() => {
 
   return (
     <Card className="p-6 max-w-2xl mx-auto mt-6">
-      <h2 className="text-2xl font-bold mb-6">Administración de Usuarios</h2>
+      <h2 className="text-2xl font-bold mb-6">
+        Administración de Usuarios
+      </h2>
 
-      
-
-      {/* ===================== FORMULARIO ===================== */}
       {detalle && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
@@ -180,14 +137,13 @@ useEffect(() => {
             )}
           </div>
 
-          {/* Rol (solo lectura) */}
+          {/* Rol */}
           <div>
-            
             <Label>Rol</Label>
             <Input value={rolTexto} disabled />
           </div>
 
-          {/* Fecha registro (solo lectura) */}
+          {/* Fecha */}
           <div>
             <Label>Fecha de Registro</Label>
             <Input value={detalle.fecha_registro || ""} disabled />

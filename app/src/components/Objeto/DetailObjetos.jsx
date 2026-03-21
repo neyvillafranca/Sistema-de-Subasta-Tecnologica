@@ -24,7 +24,7 @@ export default function DetailObjetos() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const BASE_URL = import.meta.env.VITE_BASE_URL;
+    const BASE_URL = import.meta.env.VITE_BASE_URL + 'uploads';
 
    const fetchObjeto = async (idObjeto) => {
         if (!idObjeto) return;
@@ -74,23 +74,23 @@ export default function DetailObjetos() {
                 <EmptyState message="Ingrese un identificador para buscar un objeto." />
             )}
 
-            {/* 📦 DETALLE DEL OBJETO */}
+            {/*DETALLE DEL OBJETO */}
             {objeto && (
                 <>
-                    {/* 🖼️ TODAS LAS IMÁGENES del objeto */}
+                    {/*TODAS LAS IMÁGENES del objeto */}
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {objeto.imagenes && objeto.imagenes.length > 0 ? (
                             objeto.imagenes.map((img) => (
                                 <img
                                     key={img.id_imagen_objeto}
-                                    src={`${BASE_URL}${img.url_imagen}`}
+                                    src={`${BASE_URL}/${img.url_imagen}`}
                                     alt={objeto.nombre}
                                     className="aspect-video object-cover rounded-md border"
                                 />
                             ))
                         ) : objeto.imagen?.url_imagen ? (
                             <img
-                                src={`${BASE_URL}${objeto.imagen.url_imagen}`}
+                                src={`${BASE_URL}/${objeto.imagen.url_imagen}`}
                                 alt={objeto.nombre}
                                 className="aspect-video object-cover rounded-md border"
                             />
@@ -101,7 +101,7 @@ export default function DetailObjetos() {
                         )}
                     </div>
 
-                    {/* 📄 Información general */}
+                    {/* Información general */}
                     <div className="rounded-md border p-6 space-y-3">
                         <h2 className="text-xl font-semibold">{objeto.nombre}</h2>
 
@@ -109,7 +109,7 @@ export default function DetailObjetos() {
                             {objeto.descripcion || "Sin descripción"}
                         </p>
 
-                        {/* 🏷️ Categorías */}
+                        {/*Categorías */}
                         <div className="flex flex-wrap gap-2">
                             {objeto.categoria && objeto.categoria.length > 0 ? (
                                 objeto.categoria.map((cat) => (
@@ -122,7 +122,7 @@ export default function DetailObjetos() {
                             )}
                         </div>
 
-                        {/* ℹ️ Detalles */}
+                        {/*Detalles */}
                         <div className="grid sm:grid-cols-2 gap-2 pt-2">
                             <p>
                                 <strong>Condición:</strong>{" "}
@@ -143,7 +143,7 @@ export default function DetailObjetos() {
                         </div>
                     </div>
 
-                    {/* 📊 Historial de Subastas */}
+                    {/*Historial de Subastas */}
                     <div className="rounded-md border">
                         <h3 className="text-lg font-semibold p-4 border-b">Historial de Subastas</h3>
                         <Table>
@@ -185,7 +185,7 @@ export default function DetailObjetos() {
                 </>
             )}
 
-            {/* ⬅️ Volver */}
+            {/*Volver */}
             <Button asChild className="flex gap-2">
                 <Link to="/objetos">
                     <ArrowLeft className="w-4 h-4" />

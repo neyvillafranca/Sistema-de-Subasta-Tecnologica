@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { LoadingGrid } from "../ui/custom/LoadingGrid";
 import { EmptyState } from "../ui/custom/EmptyState";
 import { ErrorAlert } from "../ui/custom/ErrorAlert";
-import ListCardObjetos from "./ListCardObjetos"; // 
+import ListCardObjetos from "./ListCardObjetos"; 
 import ObjetoService from "@/services/ObjetoService";
 
 export default function ListObjetos() {
@@ -20,7 +20,7 @@ export default function ListObjetos() {
         if (!response.data.success) {
           setError(response.data.message);
         } else {
-          setData(response.data.data); // 👈 SOLO EL ARRAY
+          setData(response.data.data); 
         }
       } catch (err) {
         setError(err.message || "Error al conectar con el servidor");
